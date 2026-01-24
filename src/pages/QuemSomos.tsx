@@ -11,7 +11,7 @@ import {
   BookOpen,
   Shield
 } from 'lucide-react';
-import lawyerPortrait from '@/assets/lawyer-portrait.webp';
+import lawyerPortrait from '@/assets/lawyer-portrait.jpg';
 
 const credentials = [
   {
