@@ -128,7 +128,7 @@ export default function QuemSomos() {
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Advogada inscrita na OAB/MS, com formação sólida e experiência 
+                  Advogado inscrito na OAB/MS, com formação sólida e experiência 
                   diversificada nas principais áreas do Direito. Desde o início da 
                   carreira, tem como missão tornar o acesso à justiça mais 
                   <strong className="text-foreground"> simples, humano e acessível</strong>.
