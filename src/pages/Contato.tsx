@@ -4,12 +4,10 @@ import { Button } from '@/components/ui/button';
 import { 
   Mail, 
   Phone, 
-  MapPin, 
   Clock, 
   Send,
   Instagram,
-  Linkedin,
-  MessageSquare
+  Facebook
 } from 'lucide-react';
 
 export default function Contato() {
@@ -74,8 +72,8 @@ export default function Contato() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">E-mail</p>
-                      <a href="mailto:contato@danyelferreira.adv.br" className="text-muted-foreground hover:text-gold transition-colors">
-                        contato@danyelferreira.adv.br
+                      <a href="mailto:advdanyelferreira@gmail.com" className="text-muted-foreground hover:text-gold transition-colors">
+                        advdanyelferreira@gmail.com
                       </a>
                     </div>
                   </div>
@@ -86,22 +84,9 @@ export default function Contato() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Telefone / WhatsApp</p>
-                      <a href="tel:+5567999999999" className="text-muted-foreground hover:text-gold transition-colors">
-                        (67) 99999-9999
+                      <a href="tel:+5567991443348" className="text-muted-foreground hover:text-gold transition-colors">
+                        (67) 99144-3348
                       </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
-                      <MapPin className="w-5 h-5 text-gold" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Localização</p>
-                      <p className="text-muted-foreground">
-                        Campo Grande, MS<br />
-                        Brasil
-                      </p>
                     </div>
                   </div>
 
@@ -112,8 +97,7 @@ export default function Contato() {
                     <div>
                       <p className="font-medium text-foreground">Horário de Atendimento</p>
                       <p className="text-muted-foreground">
-                        Segunda a Sexta: 8h às 18h<br />
-                        Sábados: 8h às 12h
+                        Segunda a Sexta: 8h às 11h e 14h às 18h
                       </p>
                     </div>
                   </div>
@@ -125,25 +109,22 @@ export default function Contato() {
                 <h3 className="font-medium text-foreground mb-4">Redes Sociais</h3>
                 <div className="flex gap-3">
                   <a
-                    href="#"
+                    href="https://www.instagram.com/adv.danyelferreira/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-gold hover:text-primary transition-colors"
                     aria-label="Instagram"
                   >
                     <Instagram className="w-5 h-5" />
                   </a>
                   <a
-                    href="#"
+                    href="https://www.facebook.com/danyelfsm/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-gold hover:text-primary transition-colors"
-                    aria-label="LinkedIn"
+                    aria-label="Facebook"
                   >
-                    <Linkedin className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="#"
-                    className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center hover:bg-gold hover:text-primary transition-colors"
-                    aria-label="WhatsApp"
-                  >
-                    <MessageSquare className="w-5 h-5" />
+                    <Facebook className="w-5 h-5" />
                   </a>
                 </div>
               </div>
