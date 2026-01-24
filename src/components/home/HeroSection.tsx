@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Calendar, UserPlus, ChevronDown } from 'lucide-react';
-import lawyerPortrait from '@/assets/lawyer-portrait.webp';
+import lawyerPortrait from '@/assets/lawyer-portrait.jpg';
 
 export function HeroSection() {
   const scrollToContent = () => {
