@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Calendar, UserPlus, ChevronDown } from 'lucide-react';
-import lawyerPortrait from '@/assets/lawyer-portrait.jpg';
+import lawyerPortrait from '@/assets/lawyer-portrait.webp';
 
 export function HeroSection() {
   const scrollToContent = () => {
@@ -86,7 +86,7 @@ export function HeroSection() {
                 {/* Name badge */}
                 <div className="absolute bottom-4 left-4 right-4 bg-navy/80 backdrop-blur-sm rounded-lg p-4">
                   <p className="font-serif text-xl text-cream font-semibold">
-                    Dra. Danyel Ferreira
+                    Dr. Danyel Ferreira
                   </p>
                   <p className="text-gold text-sm">
                     OAB/MS • Especialista em Direito Penal e Civil
