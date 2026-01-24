@@ -11,7 +11,7 @@ import {
   BookOpen,
   Shield
 } from 'lucide-react';
-import lawyerPortrait from '@/assets/lawyer-portrait.jpg';
+import lawyerPortrait from '@/assets/lawyer-portrait.webp';
 
 const credentials = [
   {
@@ -120,10 +120,10 @@ export default function QuemSomos() {
             {/* Content */}
             <div>
               <span className="text-gold text-sm font-semibold tracking-wider uppercase">
-                A Fundadora
+                O Fundador
               </span>
               <h2 className="font-serif text-3xl md:text-4xl text-foreground mt-2 mb-6">
-                Dra. Danyel Ferreira
+                Dr. Danyel Ferreira
               </h2>
               
               <div className="space-y-4 text-muted-foreground leading-relaxed">
