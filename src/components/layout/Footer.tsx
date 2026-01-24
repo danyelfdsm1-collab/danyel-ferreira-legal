@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Scale, Mail, Phone, MapPin, Instagram, Linkedin } from 'lucide-react';
+import { Scale, Mail, Phone, Instagram, Facebook, Clock } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -27,18 +27,22 @@ export function Footer() {
             </p>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://www.instagram.com/adv.danyelferreira/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-navy-light flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href="https://www.facebook.com/danyelfsm/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-navy-light flex items-center justify-center hover:bg-gold hover:text-navy transition-colors"
-                aria-label="LinkedIn"
+                aria-label="Facebook"
               >
-                <Linkedin className="w-5 h-5" />
+                <Facebook className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -101,19 +105,19 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <Mail className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                 <span className="text-cream/70 text-sm">
-                  contato@danyelferreira.adv.br
+                  advdanyelferreira@gmail.com
                 </span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                 <span className="text-cream/70 text-sm">
-                  (67) 99999-9999
+                  (67) 99144-3348
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                <Clock className="w-5 h-5 text-gold shrink-0 mt-0.5" />
                 <span className="text-cream/70 text-sm">
-                  Campo Grande, MS
+                  Seg a Sex: 8h às 11h e 14h às 18h
                 </span>
               </li>
             </ul>
