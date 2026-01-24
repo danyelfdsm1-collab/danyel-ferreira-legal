@@ -1,0 +1,4 @@
+project_id = "tcexeivjipnmgpkagdzj"
+
+[functions.ia-juridica]
+verify_jwt = false
