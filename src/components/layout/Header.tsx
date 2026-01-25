@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Scale } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Scale, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 const navItems = [
   { label: 'Início', href: '/' },
@@ -16,7 +17,17 @@ const navItems = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === '/';
+  const { user, isAuthenticated, signOut, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+    setIsMenuOpen(false);
+  };
+
+  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Usuário';
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -55,14 +66,33 @@ export function Header() {
 
           {/* Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="nav">Entrar</Button>
-            </Link>
-            <Link to="/cadastro">
-              <Button variant="gold" size="sm">
-                Criar Conta
-              </Button>
-            </Link>
+            {!loading && (
+              isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-cream">
+                    <User className="w-4 h-4 text-gold" />
+                    <span className="text-sm font-medium truncate max-w-[120px]">
+                      {userName}
+                    </span>
+                  </div>
+                  <Button variant="goldOutline" size="sm" onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-1" />
+                    Sair
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="nav">Entrar</Button>
+                  </Link>
+                  <Link to="/cadastro">
+                    <Button variant="gold" size="sm">
+                      Criar Conta
+                    </Button>
+                  </Link>
+                </>
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -92,16 +122,33 @@ export function Header() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 px-4 pt-4 border-t border-navy-light mt-4">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="goldOutline" className="w-full">
-                    Entrar
-                  </Button>
-                </Link>
-                <Link to="/cadastro" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="gold" className="w-full">
-                    Criar Conta
-                  </Button>
-                </Link>
+                {!loading && (
+                  isAuthenticated ? (
+                    <>
+                      <div className="flex items-center gap-2 text-cream py-2">
+                        <User className="w-4 h-4 text-gold" />
+                        <span className="text-sm font-medium">Olá, {userName}</span>
+                      </div>
+                      <Button variant="goldOutline" className="w-full" onClick={handleSignOut}>
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sair
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="goldOutline" className="w-full">
+                          Entrar
+                        </Button>
+                      </Link>
+                      <Link to="/cadastro" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="gold" className="w-full">
+                          Criar Conta
+                        </Button>
+                      </Link>
+                    </>
+                  )
+                )}
               </div>
             </nav>
           </div>

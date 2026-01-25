@@ -1,8 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Scale, User, Phone, Check } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { z } from 'zod';
+
+const cadastroSchema = z.object({
+  name: z.string().trim().min(2, 'Nome deve ter pelo menos 2 caracteres').max(100),
+  email: z.string().trim().email('E-mail inválido').max(255),
+  phone: z.string().trim().min(10, 'Telefone inválido').max(20),
+  password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres').max(100),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'As senhas não coincidem',
+  path: ['confirmPassword']
+});
+
+type FormErrors = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
+  confirmPassword?: string;
+};
 
 export default function Cadastro() {
   const [formData, setFormData] = useState({
@@ -16,18 +37,50 @@ export default function Cadastro() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptLGPD, setAcceptLGPD] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const { signUp, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (errors[e.target.name as keyof FormErrors]) {
+      setErrors({ ...errors, [e.target.name]: undefined });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptTerms || !acceptLGPD) return;
+    setErrors({});
+
+    // Validate inputs
+    const result = cadastroSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      result.error.errors.forEach((err) => {
+        const field = err.path[0] as keyof FormErrors;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const { error } = await signUp(formData.email, formData.password, formData.name, formData.phone);
+    setIsLoading(false);
+
+    if (!error) {
+      navigate('/');
+    }
   };
 
   const passwordsMatch = formData.password === formData.confirmPassword && formData.password.length > 0;
@@ -66,10 +119,15 @@ export default function Cadastro() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Seu nome"
-                      className="w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+                      className={`w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                        errors.name ? 'ring-2 ring-destructive' : 'focus:ring-gold'
+                      }`}
                       required
                     />
                   </div>
+                  {errors.name && (
+                    <p className="text-destructive text-sm mt-1">{errors.name}</p>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -85,10 +143,15 @@ export default function Cadastro() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="seu@email.com"
-                      className="w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+                      className={`w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                        errors.email ? 'ring-2 ring-destructive' : 'focus:ring-gold'
+                      }`}
                       required
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-destructive text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
 
                 {/* Phone */}
@@ -104,10 +167,15 @@ export default function Cadastro() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="(00) 00000-0000"
-                      className="w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+                      className={`w-full pl-10 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                        errors.phone ? 'ring-2 ring-destructive' : 'focus:ring-gold'
+                      }`}
                       required
                     />
                   </div>
+                  {errors.phone && (
+                    <p className="text-destructive text-sm mt-1">{errors.phone}</p>
+                  )}
                 </div>
 
                 {/* Password */}
@@ -123,7 +191,9 @@ export default function Cadastro() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Mínimo 8 caracteres"
-                      className="w-full pl-10 pr-12 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+                      className={`w-full pl-10 pr-12 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                        errors.password ? 'ring-2 ring-destructive' : 'focus:ring-gold'
+                      }`}
                       required
                       minLength={8}
                     />
@@ -135,6 +205,9 @@ export default function Cadastro() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {errors.password && (
+                    <p className="text-destructive text-sm mt-1">{errors.password}</p>
+                  )}
                 </div>
 
                 {/* Confirm Password */}
@@ -151,16 +224,19 @@ export default function Cadastro() {
                       onChange={handleChange}
                       placeholder="Repita sua senha"
                       className={`w-full pl-10 pr-12 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
-                        formData.confirmPassword && !passwordsMatch 
-                          ? 'ring-2 ring-red-500' 
+                        (formData.confirmPassword && !passwordsMatch) || errors.confirmPassword
+                          ? 'ring-2 ring-destructive' 
                           : 'focus:ring-gold'
                       }`}
                       required
                     />
-                    {formData.confirmPassword && passwordsMatch && (
-                      <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
+                    {formData.confirmPassword && passwordsMatch && !errors.confirmPassword && (
+                      <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
                     )}
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>
+                  )}
                 </div>
 
                 {/* Terms */}
