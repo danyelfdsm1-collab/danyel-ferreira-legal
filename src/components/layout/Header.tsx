@@ -69,12 +69,12 @@ export function Header() {
             {!loading && (
               isAuthenticated ? (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-cream">
+                  <Link to="/perfil" className="flex items-center gap-2 text-cream hover:text-gold transition-colors">
                     <User className="w-4 h-4 text-gold" />
                     <span className="text-sm font-medium truncate max-w-[120px]">
                       {userName}
                     </span>
-                  </div>
+                  </Link>
                   <Button variant="goldOutline" size="sm" onClick={handleSignOut}>
                     <LogOut className="w-4 h-4 mr-1" />
                     Sair
@@ -125,10 +125,14 @@ export function Header() {
                 {!loading && (
                   isAuthenticated ? (
                     <>
-                      <div className="flex items-center gap-2 text-cream py-2">
+                      <Link 
+                        to="/perfil" 
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-2 text-cream py-2 hover:text-gold transition-colors"
+                      >
                         <User className="w-4 h-4 text-gold" />
                         <span className="text-sm font-medium">Olá, {userName}</span>
-                      </div>
+                      </Link>
                       <Button variant="goldOutline" className="w-full" onClick={handleSignOut}>
                         <LogOut className="w-4 h-4 mr-2" />
                         Sair
