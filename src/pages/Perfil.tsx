@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AppointmentsList } from '@/components/profile/AppointmentsList';
 
 const perfilSchema = z.object({
   name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100, 'Nome muito longo'),
@@ -297,6 +298,13 @@ const Perfil = () => {
               </form>
             </CardContent>
           </Card>
+
+          {/* Appointments Section */}
+          {user?.id && (
+            <div className="mt-8">
+              <AppointmentsList userId={user.id} />
+            </div>
+          )}
         </div>
       </section>
     </Layout>
