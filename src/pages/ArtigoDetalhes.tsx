@@ -1,8 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { articles } from '@/data/articles';
-import { Calendar, Clock, ArrowLeft, ArrowRight, Share2 } from 'lucide-react';
+import { useArticle, useArticles } from '@/hooks/useArticles';
+import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 
@@ -31,17 +31,43 @@ const handleShare = async (title: string, excerpt: string) => {
 
 export default function ArtigoDetalhes() {
   const { id } = useParams<{ id: string }>();
-  const articleId = parseInt(id || '0', 10);
   
-  const article = articles.find((a) => a.id === articleId);
+  const { article, isLoading, error } = useArticle(id || '');
+  const { articles } = useArticles();
   
   // Artigos relacionados (mesma categoria, exceto o atual)
   const relatedArticles = articles
-    .filter((a) => a.category === article?.category && a.id !== articleId)
+    .filter((a) => a.category === article?.category && a.id !== article?.id)
     .slice(0, 2);
 
+  // Get category emoji
+  const categoryEmojis: Record<string, string> = {
+    'Direito do Consumidor': '🛒',
+    'Direito Previdenciário': '👴',
+    'Direito de Família': '👨‍👩‍👧‍👦',
+    'Direito do Trabalho': '💼',
+    'Direito Trabalhista': '💼',
+    'Direito Penal': '⚖️',
+    'Direito Civil': '📜',
+    'Direito Imobiliário': '🏠',
+    'Direito de Trânsito': '🚗',
+    'Direito das Sucessões': '📜',
+  };
 
-  if (!article) {
+  if (isLoading) {
+    return (
+      <Layout>
+        <section className="pt-32 pb-16 bg-gradient-navy min-h-screen">
+          <div className="container mx-auto px-4 text-center">
+            <Loader2 className="w-12 h-12 text-gold animate-spin mx-auto mb-4" />
+            <p className="text-cream/70">Carregando artigo...</p>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
+
+  if (error || !article) {
     return (
       <Layout>
         <section className="pt-32 pb-16 bg-gradient-navy min-h-screen">
@@ -59,16 +85,6 @@ export default function ArtigoDetalhes() {
       </Layout>
     );
   }
-
-  // Get category emoji
-  const categoryEmojis: Record<string, string> = {
-    'Direito do Consumidor': '🛒',
-    'Direito Previdenciário': '👴',
-    'Direito de Família': '👨‍👩‍👧‍👦',
-    'Direito do Trabalho': '💼',
-    'Direito Penal': '⚖️',
-    'Direito Civil': '📜',
-  };
 
   const categoryEmoji = categoryEmojis[article.category] || '📋';
 
@@ -102,7 +118,7 @@ export default function ArtigoDetalhes() {
               <div className="flex items-center gap-6 text-cream/70">
                 <span className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {new Date(article.date).toLocaleDateString('pt-BR', {
+                  {new Date(article.createdAt).toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric',
@@ -131,13 +147,13 @@ export default function ArtigoDetalhes() {
       </section>
 
       {/* Article Image */}
-      {article.image && article.image !== '/placeholder.svg' && (
+      {article.imageUrl && article.imageUrl !== '/placeholder.svg' && (
         <section className="bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto -mt-8">
               <div className="aspect-video rounded-xl overflow-hidden shadow-2xl border border-border">
                 <img
-                  src={article.image}
+                  src={article.imageUrl}
                   alt={article.title}
                   className="w-full h-full object-cover"
                 />
@@ -216,7 +232,7 @@ export default function ArtigoDetalhes() {
                 O conteúdo possui caráter meramente informativo e educativo, não substituindo a consulta a um advogado para análise do caso concreto.
               </p>
               <p className="text-xs text-muted-foreground mt-4">
-                Data de publicação: {new Date(article.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}. 
+                Data de publicação: {new Date(article.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}. 
                 Acesso em: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}.
               </p>
             </div>
