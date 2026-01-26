@@ -32,7 +32,7 @@ const practiceAreas = [
 const lawyers = [
   {
     id: 'danyel',
-    name: 'Dra. Danyel Ferreira',
+    name: 'Dr. Danyel Ferreira',
     specialty: 'Direito Penal e Civil',
     image: lawyerPortrait,
     available: true,
