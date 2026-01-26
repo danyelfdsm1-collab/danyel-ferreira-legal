@@ -1,76 +1,26 @@
+import { useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, ArrowRight, Search, Tag } from 'lucide-react';
-
-const articles = [
-  {
-    id: 1,
-    title: 'Conheça seus direitos como consumidor em compras online',
-    excerpt: 'Entenda as garantias legais e o que fazer quando algo dá errado em suas compras pela internet.',
-    category: 'Direito do Consumidor',
-    date: '2024-01-22',
-    readTime: '5 min',
-    image: '/placeholder.svg',
-  },
-  {
-    id: 2,
-    title: 'INSS: Como funciona a aposentadoria por tempo de contribuição',
-    excerpt: 'Tudo o que você precisa saber sobre regras de transição, cálculos e documentação necessária.',
-    category: 'Direito Previdenciário',
-    date: '2024-01-20',
-    readTime: '8 min',
-    image: '/placeholder.svg',
-  },
-  {
-    id: 3,
-    title: 'Pensão alimentícia: quem tem direito e como solicitar',
-    excerpt: 'Saiba quais são os critérios legais e os passos para requerer ou revisar pensão alimentícia.',
-    category: 'Direito de Família',
-    date: '2024-01-18',
-    readTime: '6 min',
-    image: '/placeholder.svg',
-  },
-  {
-    id: 4,
-    title: 'Rescisão trabalhista: entenda todas as verbas devidas',
-    excerpt: 'Conheça seus direitos ao ser demitido e aprenda a conferir se recebeu tudo corretamente.',
-    category: 'Direito do Trabalho',
-    date: '2024-01-15',
-    readTime: '7 min',
-    image: '/placeholder.svg',
-  },
-  {
-    id: 5,
-    title: 'O que fazer se você for vítima de um crime: passo a passo',
-    excerpt: 'Orientações importantes sobre como agir e quais órgãos procurar em situações de crime.',
-    category: 'Direito Penal',
-    date: '2024-01-12',
-    readTime: '6 min',
-    image: '/placeholder.svg',
-  },
-  {
-    id: 6,
-    title: 'Contratos de aluguel: cláusulas essenciais e cuidados',
-    excerpt: 'Aprenda a identificar os principais pontos de atenção antes de assinar um contrato de locação.',
-    category: 'Direito Civil',
-    date: '2024-01-10',
-    readTime: '5 min',
-    image: '/placeholder.svg',
-  },
-];
-
-const categories = [
-  'Todos',
-  'Direito do Consumidor',
-  'Direito Previdenciário',
-  'Direito de Família',
-  'Direito do Trabalho',
-  'Direito Penal',
-  'Direito Civil',
-];
+import { articles, categories } from '@/data/articles';
 
 export default function Artigos() {
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredArticles = useMemo(() => {
+    return articles.filter((article) => {
+      const matchesCategory =
+        selectedCategory === 'Todos' || article.category === selectedCategory;
+      const matchesSearch =
+        searchTerm === '' ||
+        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [selectedCategory, searchTerm]);
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -101,16 +51,19 @@ export default function Artigos() {
               <input
                 type="text"
                 placeholder="Buscar artigos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-muted rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-              {categories.slice(0, 4).map((cat) => (
+              {categories.map((cat) => (
                 <Button
                   key={cat}
-                  variant={cat === 'Todos' ? 'gold' : 'outline'}
+                  variant={selectedCategory === cat ? 'gold' : 'outline'}
                   size="sm"
                   className="whitespace-nowrap"
+                  onClick={() => setSelectedCategory(cat)}
                 >
                   {cat}
                 </Button>
@@ -118,9 +71,22 @@ export default function Artigos() {
             </div>
           </div>
 
+          {/* No Results */}
+          {filteredArticles.length === 0 && (
+            <div className="text-center py-12">
+              <Tag className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-serif text-xl text-foreground mb-2">
+                Nenhum artigo encontrado
+              </h3>
+              <p className="text-muted-foreground">
+                Tente ajustar os filtros ou buscar por outros termos.
+              </p>
+            </div>
+          )}
+
           {/* Articles Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <article
                 key={article.id}
                 className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow group"
@@ -166,13 +132,6 @@ export default function Artigos() {
                 </div>
               </article>
             ))}
-          </div>
-
-          {/* Load More */}
-          <div className="text-center mt-12">
-            <Button variant="outline" size="lg">
-              Carregar mais artigos
-            </Button>
           </div>
         </div>
       </section>

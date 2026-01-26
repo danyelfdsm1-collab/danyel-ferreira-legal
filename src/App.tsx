@@ -9,6 +9,7 @@ import AreasAtuacao from "./pages/AreasAtuacao";
 import IAJuridica from "./pages/IAJuridica";
 import Consulta from "./pages/Consulta";
 import Artigos from "./pages/Artigos";
+import ArtigoDetalhes from "./pages/ArtigoDetalhes";
 import Contato from "./pages/Contato";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/ia-juridica" element={<IAJuridica />} />
           <Route path="/consulta" element={<Consulta />} />
           <Route path="/artigos" element={<Artigos />} />
+          <Route path="/artigos/:id" element={<ArtigoDetalhes />} />
           <Route path="/contato" element={<Contato />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
