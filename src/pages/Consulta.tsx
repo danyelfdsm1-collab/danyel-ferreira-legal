@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -8,12 +9,15 @@ import {
   Mic, 
   MessageSquare, 
   Clock,
-  User,
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Loader2
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import lawyerPortrait from '@/assets/lawyer-portrait.jpg';
 
 const practiceAreas = [
@@ -47,13 +51,17 @@ const modalityOptions = [
 ];
 
 export default function Consulta() {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { toast } = useToast();
+  
   const [step, setStep] = useState(1);
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedLawyer, setSelectedLawyer] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedModality, setSelectedModality] = useState('');
-  const [isLoggedIn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const generateDates = () => {
     const dates = [];
@@ -82,6 +90,63 @@ export default function Consulta() {
     }
   };
 
+  const handleConfirmAppointment = async () => {
+    if (!user?.id) {
+      toast({
+        title: 'Erro',
+        description: 'Você precisa estar logado para agendar.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const appointmentDate = new Date(selectedDate).toISOString().split('T')[0];
+      const lawyerName = lawyers.find(l => l.id === selectedLawyer)?.name || selectedLawyer;
+      const areaName = practiceAreas.find(a => a.id === selectedArea)?.name || selectedArea;
+
+      const { error } = await supabase
+        .from('appointments')
+        .insert({
+          user_id: user.id,
+          practice_area: areaName,
+          lawyer: lawyerName,
+          appointment_date: appointmentDate,
+          appointment_time: selectedTime,
+          modality: selectedModality,
+          status: 'pendente',
+        });
+
+      if (error) {
+        console.error('Error creating appointment:', error);
+        toast({
+          title: 'Erro ao agendar',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Agendamento confirmado!',
+        description: 'Sua consulta foi agendada com sucesso. Verifique seus agendamentos no perfil.',
+      });
+
+      navigate('/perfil');
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: 'Erro inesperado',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -102,7 +167,7 @@ export default function Consulta() {
       </section>
 
       {/* Login Check */}
-      {!isLoggedIn && (
+      {!authLoading && !isAuthenticated && (
         <section className="py-8 bg-amber-50 border-b border-amber-200">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
@@ -383,7 +448,7 @@ export default function Consulta() {
                   </div>
                 </div>
 
-                {!isLoggedIn ? (
+                {!authLoading && !isAuthenticated ? (
                   <div className="space-y-3">
                     <p className="text-muted-foreground text-sm">
                       Faça login ou crie uma conta para confirmar o agendamento.
@@ -398,8 +463,20 @@ export default function Consulta() {
                     </div>
                   </div>
                 ) : (
-                  <Button variant="gold" size="lg">
-                    Confirmar Agendamento
+                  <Button 
+                    variant="gold" 
+                    size="lg"
+                    onClick={handleConfirmAppointment}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Agendando...
+                      </>
+                    ) : (
+                      'Confirmar Agendamento'
+                    )}
                   </Button>
                 )}
               </div>
