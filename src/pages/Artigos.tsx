@@ -4,10 +4,33 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, ArrowRight, Search, Tag } from 'lucide-react';
 import { articles, categories } from '@/data/articles';
+import { toast } from 'sonner';
 
 export default function Artigos() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      toast.error('Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    setIsSubscribing(true);
+    
+    // Simula envio (pode ser integrado com backend futuramente)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast.success('Inscrição realizada com sucesso! 🎉', {
+      description: 'Você receberá nossos artigos jurídicos em breve.',
+    });
+    setEmail('');
+    setIsSubscribing(false);
+  };
 
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
@@ -141,21 +164,24 @@ export default function Artigos() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-4">
-              Receba nossos artigos por e-mail
+              📬 Receba nossos artigos por e-mail
             </h2>
             <p className="text-muted-foreground mb-6">
               Cadastre-se para receber conteúdo jurídico gratuito e ficar por dentro dos seus direitos.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <input
                 type="email"
                 placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-gold"
+                required
               />
-              <Button variant="gold">
-                Inscrever-se
+              <Button type="submit" variant="gold" disabled={isSubscribing}>
+                {isSubscribing ? 'Enviando...' : 'Inscrever-se'}
               </Button>
-            </div>
+            </form>
           </div>
         </div>
       </section>

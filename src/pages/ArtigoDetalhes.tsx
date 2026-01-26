@@ -2,9 +2,32 @@ import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { articles } from '@/data/articles';
-import { Calendar, Clock, ArrowLeft, ArrowRight, Share2, Bookmark } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ArrowRight, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
+
+const handleShare = async (title: string, excerpt: string) => {
+  const shareData = {
+    title: title,
+    text: excerpt,
+    url: window.location.href,
+  };
+
+  try {
+    if (navigator.share && navigator.canShare(shareData)) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copiado para a área de transferência!');
+    }
+  } catch (error) {
+    // User cancelled or error
+    if ((error as Error).name !== 'AbortError') {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copiado para a área de transferência!');
+    }
+  }
+};
 
 export default function ArtigoDetalhes() {
   const { id } = useParams<{ id: string }>();
@@ -17,18 +40,6 @@ export default function ArtigoDetalhes() {
     .filter((a) => a.category === article?.category && a.id !== articleId)
     .slice(0, 2);
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: article?.title,
-        text: article?.excerpt,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copiado para a área de transferência!');
-    }
-  };
 
   if (!article) {
     return (
@@ -104,7 +115,12 @@ export default function ArtigoDetalhes() {
               </div>
               
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-cream border-cream/30 hover:bg-cream/10" onClick={handleShare}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-cream border-cream/30 hover:bg-cream/10" 
+                  onClick={() => handleShare(article.title, article.excerpt)}
+                >
                   <Share2 className="w-4 h-4 mr-2" />
                   Compartilhar
                 </Button>
