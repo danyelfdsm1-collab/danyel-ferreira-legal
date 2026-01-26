@@ -2,3 +2,9 @@ project_id = "tcexeivjipnmgpkagdzj"
 
 [functions.ia-juridica]
 verify_jwt = false
+
+[functions.gerar-artigo]
+verify_jwt = false
+
+[functions.gerar-imagem-artigo]
+verify_jwt = false
