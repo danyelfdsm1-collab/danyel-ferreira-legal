@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.gerar-imagem-artigo]
 verify_jwt = false
+
+[functions.gerar-artigo-automatico]
+verify_jwt = false

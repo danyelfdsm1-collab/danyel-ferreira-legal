@@ -2,8 +2,9 @@ import { useState, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ArrowRight, Search, Tag } from 'lucide-react';
-import { articles, categories } from '@/data/articles';
+import { Calendar, Clock, ArrowRight, Search, Tag, Loader2 } from 'lucide-react';
+import { categories } from '@/data/articles';
+import { useArticles } from '@/hooks/useArticles';
 import { toast } from 'sonner';
 
 export default function Artigos() {
@@ -11,6 +12,8 @@ export default function Artigos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const { articles, isLoading } = useArticles();
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +45,7 @@ export default function Artigos() {
         article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchTerm]);
+  }, [articles, selectedCategory, searchTerm]);
 
   return (
     <Layout>
@@ -94,8 +97,16 @@ export default function Artigos() {
             </div>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 text-gold animate-spin" />
+              <span className="ml-3 text-muted-foreground">Carregando artigos...</span>
+            </div>
+          )}
+
           {/* No Results */}
-          {filteredArticles.length === 0 && (
+          {!isLoading && filteredArticles.length === 0 && (
             <div className="text-center py-12">
               <Tag className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-serif text-xl text-foreground mb-2">
@@ -108,54 +119,64 @@ export default function Artigos() {
           )}
 
           {/* Articles Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredArticles.map((article) => (
-              <article
-                key={article.id}
-                className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow group"
-              >
-                {/* Image */}
-                <div className="aspect-video bg-muted relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-navy/80 to-navy/40 flex items-center justify-center">
-                    <Tag className="w-12 h-12 text-gold/50" />
-                  </div>
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-gold text-primary text-xs font-semibold rounded-full">
-                    {article.category}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(article.date).toLocaleDateString('pt-BR')}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {article.readTime}
+          {!isLoading && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredArticles.map((article) => (
+                <article
+                  key={article.id}
+                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow group"
+                >
+                  {/* Image */}
+                  <div className="aspect-video bg-muted relative overflow-hidden">
+                    {article.imageUrl && article.imageUrl !== '/placeholder.svg' ? (
+                      <img
+                        src={article.imageUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-navy/80 to-navy/40 flex items-center justify-center">
+                        <Tag className="w-12 h-12 text-gold/50" />
+                      </div>
+                    )}
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-gold text-primary text-xs font-semibold rounded-full">
+                      {article.category}
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-xl text-foreground font-semibold mb-2 group-hover:text-gold transition-colors line-clamp-2">
-                    {article.title}
-                  </h2>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {new Date(article.createdAt).toLocaleDateString('pt-BR')}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {article.readTime}
+                      </span>
+                    </div>
 
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                    {article.excerpt}
-                  </p>
+                    <h2 className="font-serif text-xl text-foreground font-semibold mb-2 group-hover:text-gold transition-colors line-clamp-2">
+                      {article.title}
+                    </h2>
 
-                  <Link
-                    to={`/artigos/${article.id}`}
-                    className="inline-flex items-center gap-2 text-gold text-sm font-medium hover:gap-3 transition-all"
-                  >
-                    Ler artigo
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                      {article.excerpt}
+                    </p>
+
+                    <Link
+                      to={`/artigos/${article.id}`}
+                      className="inline-flex items-center gap-2 text-gold text-sm font-medium hover:gap-3 transition-all"
+                    >
+                      Ler artigo
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
