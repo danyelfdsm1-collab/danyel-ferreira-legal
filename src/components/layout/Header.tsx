@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Scale, LogOut, User } from 'lucide-react';
+import { Menu, X, Scale, LogOut, User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/useAdmin';
 
 const navItems = [
   { label: 'Início', href: '/' },
@@ -20,6 +21,7 @@ export function Header() {
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const { user, isAuthenticated, signOut, loading } = useAuth();
+  const { isAdmin } = useAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -69,6 +71,14 @@ export function Header() {
             {!loading && (
               isAuthenticated ? (
                 <div className="flex items-center gap-3">
+                  {isAdmin && (
+                    <Link to="/admin">
+                      <Button variant="ghost" size="sm" className="text-gold hover:text-gold/80">
+                        <Shield className="w-4 h-4 mr-1" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
                   <Link to="/perfil" className="flex items-center gap-2 text-cream hover:text-gold transition-colors">
                     <User className="w-4 h-4 text-gold" />
                     <span className="text-sm font-medium truncate max-w-[120px]">
@@ -125,6 +135,16 @@ export function Header() {
                 {!loading && (
                   isAuthenticated ? (
                     <>
+                      {isAdmin && (
+                        <Link 
+                          to="/admin" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-2 text-gold py-2 hover:text-gold/80 transition-colors"
+                        >
+                          <Shield className="w-4 h-4" />
+                          <span className="text-sm font-medium">Painel Admin</span>
+                        </Link>
+                      )}
                       <Link 
                         to="/perfil" 
                         onClick={() => setIsMenuOpen(false)}
