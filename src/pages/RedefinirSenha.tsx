@@ -29,28 +29,65 @@ export default function RedefinirSenha() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user arrived via password reset link
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // User should have a session from the reset link
-      if (session) {
-        setIsValidSession(true);
-      } else {
-        setIsValidSession(false);
-      }
-    };
-
-    checkSession();
-
-    // Listen for auth state changes (when user clicks the reset link)
+    let isValidSessionSet = false;
+    
+    // Configurar listener PRIMEIRO - CRÍTICO para capturar PASSWORD_RECOVERY
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth event:', event);
+        
         if (event === 'PASSWORD_RECOVERY') {
+          isValidSessionSet = true;
+          setIsValidSession(true);
+        } else if (event === 'SIGNED_IN' && session && !isValidSessionSet) {
+          // Também aceita SIGNED_IN após recovery
+          isValidSessionSet = true;
           setIsValidSession(true);
         }
       }
     );
+
+    // Verificar se há tokens na URL (fragmento hash)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const hasRecoveryToken = hashParams.get('type') === 'recovery' || 
+                             hashParams.get('access_token');
+
+    if (hasRecoveryToken) {
+      // Dar tempo para o Supabase processar os tokens
+      const timeout = setTimeout(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!isValidSessionSet) {
+            if (session) {
+              setIsValidSession(true);
+            } else {
+              setIsValidSession(false);
+            }
+          }
+        });
+      }, 3000);
+
+      return () => {
+        clearTimeout(timeout);
+        subscription.unsubscribe();
+      };
+    }
+
+    // Sem tokens na URL, verificar sessão existente
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsValidSession(true);
+      } else {
+        // Aguardar um pouco antes de invalidar
+        setTimeout(() => {
+          if (!isValidSessionSet) {
+            setIsValidSession(false);
+          }
+        }, 2000);
+      }
+    };
+
+    checkSession();
 
     return () => subscription.unsubscribe();
   }, []);
