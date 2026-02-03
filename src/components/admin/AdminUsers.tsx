@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, User, Phone, Calendar } from 'lucide-react';
+import { Loader2, User, Phone, Calendar, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Profile {
   id: string;
@@ -15,32 +26,78 @@ interface Profile {
 export function AdminUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setUsers(data || []);
-      } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível carregar os usuários.',
-          variant: 'destructive'
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar usuários:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os usuários.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setDeleting(userToDelete.user_id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ user_id: userToDelete.user_id }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao excluir usuário');
+      }
+
+      toast({
+        title: 'Sucesso',
+        description: 'Usuário excluído com sucesso.',
+      });
+
+      setUsers(users.filter(u => u.user_id !== userToDelete.user_id));
+    } catch (error: any) {
+      console.error('Erro ao excluir usuário:', error);
+      toast({
+        title: 'Erro',
+        description: error.message || 'Não foi possível excluir o usuário.',
+        variant: 'destructive'
+      });
+    } finally {
+      setDeleting(null);
+      setUserToDelete(null);
+    }
+  };
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('pt-BR', {
@@ -89,6 +146,19 @@ export function AdminUsers() {
                       Cadastrado em {formatDate(user.created_at)}
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                    onClick={() => setUserToDelete(user)}
+                    disabled={deleting === user.user_id}
+                  >
+                    {deleting === user.user_id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -99,6 +169,30 @@ export function AdminUsers() {
       <div className="mt-6 text-center text-cream/40 text-sm">
         Total: {users.length} usuário{users.length !== 1 ? 's' : ''}
       </div>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+        <AlertDialogContent className="bg-navy border-navy-light">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-cream">Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription className="text-cream/60">
+              Tem certeza que deseja excluir o usuário <strong className="text-cream">{userToDelete?.name}</strong>?
+              <br /><br />
+              Esta ação é irreversível e removerá permanentemente todos os dados do usuário, incluindo agendamentos e histórico.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-navy-light text-cream border-navy-light hover:bg-navy-light/80">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir Usuário
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
