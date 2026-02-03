@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Edit, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { GenerateArticleDialog } from './GenerateArticleDialog';
 
 interface Article {
   id: string;
@@ -217,13 +218,18 @@ export function AdminArticles() {
           <h1 className="text-3xl font-serif text-cream mb-2">Artigos</h1>
           <p className="text-cream/60">Gerencie os artigos do blog jurídico</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="gold" onClick={openNewDialog}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Artigo
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <GenerateArticleDialog 
+            onArticleGenerated={fetchArticles} 
+            existingTitles={articles.map(a => a.title)}
+          />
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="gold" onClick={openNewDialog}>
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Manual
+              </Button>
+            </DialogTrigger>
           <DialogContent className="bg-navy-light border-navy-light/50 max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-cream">
@@ -318,8 +324,9 @@ export function AdminArticles() {
                 </Button>
               </div>
             </form>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {loading ? (
