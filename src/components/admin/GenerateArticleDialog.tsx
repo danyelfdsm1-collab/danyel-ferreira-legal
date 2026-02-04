@@ -28,6 +28,18 @@ interface GenerateArticleDialogProps {
 }
 
 const TEMAS_POR_AREA: Record<string, string[]> = {
+  'Direito Penal': [
+    'Tipos de crimes e suas penas no Brasil',
+    'Prisão preventiva: quando é cabível',
+    'Legítima defesa: requisitos e limites',
+    'Crimes contra a honra: calúnia, injúria e difamação',
+    'Tráfico de drogas: penas e agravantes',
+    'Violência doméstica: Lei Maria da Penha',
+    'Crimes cibernéticos: tipos e penalidades',
+    'Homicídio culposo vs doloso: diferenças',
+    'Furto e roubo: diferenças e penas',
+    'Prescrição penal: prazos e regras',
+  ],
   'Direito Trabalhista': [
     'Direitos trabalhistas em home office',
     'Rescisão de contrato de trabalho: direitos do empregado',
