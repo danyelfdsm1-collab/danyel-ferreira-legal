@@ -81,7 +81,7 @@ export function Footer() {
               {[
                 { label: 'Termos de Uso', href: '/termos' },
                 { label: 'Política de Privacidade', href: '/privacidade' },
-                { label: 'Código de Ética OAB', href: '#' },
+                { label: 'Código de Ética OAB', href: '/codigo-etica-oab' },
                 { label: 'LGPD', href: '/lgpd' },
               ].map((link) => (
                 <li key={link.href}>

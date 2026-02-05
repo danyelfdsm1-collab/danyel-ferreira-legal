@@ -19,6 +19,10 @@ import RedefinirSenha from "./pages/RedefinirSenha";
 import Perfil from "./pages/Perfil";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import TermosUso from "./pages/TermosUso";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import CodigoEticaOAB from "./pages/CodigoEticaOAB";
+import LGPD from "./pages/LGPD";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +48,10 @@ const App = () => (
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin/*" element={<Admin />} />
+          <Route path="/termos" element={<TermosUso />} />
+          <Route path="/privacidade" element={<PoliticaPrivacidade />} />
+          <Route path="/codigo-etica-oab" element={<CodigoEticaOAB />} />
+          <Route path="/lgpd" element={<LGPD />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
