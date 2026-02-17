@@ -10,7 +10,8 @@ import {
   Users,
   MessageSquare,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  Calculator
 } from 'lucide-react';
 
 const areas = [
@@ -191,6 +192,15 @@ export default function AreasAtuacao() {
                           Tirar dúvida com IA
                         </Button>
                       </Link>
+
+                      {area.id === 'direito-trabalho' && (
+                        <Link to="/calculadora-rescisao" className="block">
+                          <Button variant="outline" className="w-full justify-start">
+                            <Calculator className="w-4 h-4" />
+                            Calculadora Rescisória
+                          </Button>
+                        </Link>
+                      )}
                       
                       <Link to="/consulta" className="block">
                         <Button variant="gold" className="w-full justify-start">

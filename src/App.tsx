@@ -23,6 +23,7 @@ import TermosUso from "./pages/TermosUso";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import CodigoEticaOAB from "./pages/CodigoEticaOAB";
 import LGPD from "./pages/LGPD";
+import CalculadoraRescisao from "./pages/CalculadoraRescisao";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/privacidade" element={<PoliticaPrivacidade />} />
           <Route path="/codigo-etica-oab" element={<CodigoEticaOAB />} />
           <Route path="/lgpd" element={<LGPD />} />
+          <Route path="/calculadora-rescisao" element={<CalculadoraRescisao />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
